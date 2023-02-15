@@ -1,4 +1,4 @@
-// chrome.runtime.onMessage.addListener(messageReceiver)
+chrome.runtime.onMessage.addListener(messageReceiver)
 const BYE = 1
 const PLAYEVERYWEEK = 2
 var teamData = [
@@ -8,7 +8,54 @@ var teamData = [
     ['OVO','',2],
     ['TOG','',1]
 ]
+class game {
+    constructor(){
+        this.datetime = Date.now()
+        this.match
 
+    }
+}
+class scheduleList{
+    constructor(){
+        this.keys = [
+            'Start_Date',
+            'Start_Time',
+            'End_Date',
+            'End_Time',
+            'Title',
+            'Location',
+            'All_Day_Event',
+            'Event_Type',
+            'Team1_ID',
+            'Team2_ID',
+            'Custom_Opponent'
+        ]
+        this.scheduleItems = []
+    }
+}
+class scheduleItem{
+    constructor(){
+        this.Start_Date = ''
+        this.Start_Time = ''
+        this.End_Date = ''
+        this.End_Time = ''
+        this.Title = ''
+        this.Location = 'AC3 Gym'
+        this.All_Day_Event = 0
+        this.Event_Type = 'Game'
+        this.Team1_ID = ''
+        this.Team1_Is_Home = 1
+        this.Team2_ID = ''
+        this.Custom_Opponent = 0
+    }
+}
+class round{
+    constructor(){
+        this.mathes = []
+        this.teams = []
+        this.ids = []
+    }
+}
 
 class team{
     constructor(){
@@ -25,29 +72,101 @@ class match{
         this.matchDelta = 0
     }
 }
-async function moveToEnd(array,element){
-    await array.push(array.splice(array.indexOf(element), 1)[0])
-    console.log(array)
+function someIncludes(){
+    conditions.some(el => str1.includes(el))
 }
-function simpleCsvSchedule(gamesPerTeam){
-    var teams = getTeamsTesting(6)
+
+function moveToEnd(array,element){
+    var tempArray = [...array]
+    var splicedElement = tempArray.splice(tempArray.indexOf(element), 1)
+    tempArray.push(splicedElement[0])
+    return tempArray
+}
+function scheduleForUpload(gamesPerTeam){
+    var scheduleList1 = new scheduleList
+    var teams = getTeams()
     var matches = getMatches(teams)
     var weeks = []
     for(var i=0;i<gamesPerTeam;i++){
-        var week = []
-        // console.log(matches)
+        var week = new round
         matches.forEach(match=>{
-            console.log(matches.indexOf(match))
-            if(!week.includes(match.ids[0]) && !week.includes(match.ids[1])){
-                week = week.concat(match.ids)
-                moveToEnd(matches,match)
-                // console.log(matches)
+            if(!week.ids.includes(match.ids[0]) && !week.ids.includes(match.ids[1])){
+                week.ids = week.ids.concat(match.ids)
+                week.mathes.push(match)
+                var scheduleItem1 = new scheduleItem
+                scheduleItem1.Start_Date = 'Date ' + (i+1)
+                scheduleItem1.End_Date = 'Date ' + (i+1)
+                scheduleItem1.Title = match.teams[0].name+' vs '+match.teams[1].name
+                scheduleItem1.Team1_ID = match.teams[0].id
+                scheduleItem1.Team2_ID = match.teams[1].id
+                scheduleList1.scheduleItems.push(scheduleItem1)
+                matches = moveToEnd(matches,match)
             }
         })
         weeks.push(week)
     }
+    // console.log(weeks)
+    var csvStr = ''
+    for(var i=0;i<scheduleList1.keys.length;i++){
+        if(!csvStr==''){csvStr+=','}
+        csvStr+='"'+scheduleList1.keys[i]+'"'
+    }
+    for(var i=0;i<scheduleList1.scheduleItems.length;i++){
+        if(!csvStr==''){csvStr+='\n'}
+        for(var j=0;j<scheduleList1.keys.length;j++){
+            if(!j==0){csvStr+=','}
+            csvStr+='"'+scheduleList1.scheduleItems[i][scheduleList1.keys[j]]+'"'
+        }
+    }
     
-    console.log(weeks)
+    window.open("data:text/csv,"+csvStr)
+    console.log('test')
+
+    // this is the simple schedule
+    
+    var csvStr = ''
+    for(var wk=0;wk<weeks.length;wk++){
+        if(!csvStr==''){csvStr+='\n\n\n'}
+        for(var mt=0;mt<weeks[wk].mathes.length;mt++){
+            if(!csvStr==''){csvStr+='\n'}
+            csvStr+='"'+weeks[wk].mathes[mt].ids[0]+'"'+','+'"'+weeks[wk].mathes[mt].ids[1]+'"'
+        }
+    }
+    window.open("data:text/csv,"+csvStr)
+    // return csvStr
+}
+function createSchedule(gamesPerTeam){
+    var teams = getTeams()
+
+}
+function simpleCsvSchedule(gamesPerTeam){
+    var teams = getTeams()
+    // var teams = getTeamsTesting(6)
+    var matches = getMatches(teams)
+    var weeks = []
+    for(var i=0;i<gamesPerTeam;i++){
+        var week = new round
+        matches.forEach(match=>{
+            if(!week.ids.includes(match.ids[0]) && !week.ids.includes(match.ids[1])){
+                week.ids = week.ids.concat(match.ids)
+                week.mathes.push(match)
+                matches = moveToEnd(matches,match)
+            }
+        })
+        weeks.push(week)
+    }
+    // console.log(weeks)
+    var csvStr = ''
+    for(var wk=0;wk<weeks.length;wk++){
+        if(!csvStr==''){csvStr+='\n\n\n'}
+        for(var mt=0;mt<weeks[wk].mathes.length;mt++){
+            if(!csvStr==''){csvStr+='\n'}
+            csvStr+=weeks[wk].mathes[mt].ids[0]+','+weeks[wk].mathes[mt].ids[1]
+        }
+    }
+    // console.log(csvStr)
+    window.open("data:text/csv,"+csvStr)
+    // return [weeks,csvStr]
 }
 function tomorrow(date){
     date.setDate(date.getDate()+1)
@@ -134,7 +253,6 @@ function getMatches(teams){
     }
     matchList.sort( compare )
     return matchList
-    // console.log(matchList)
 }
 
 function getTeams(){
@@ -169,7 +287,6 @@ function getTeams(){
             teamList.push(currentTeam)
         }
     }
-    console.log(teamList)
     return teamList
 }
 function getRegistrations(){
@@ -179,7 +296,6 @@ function getRegistrations(){
                 
                 var leaguePage = document.getElementsByTagName('tbody')[0].getElementsByTagName('a')[0].getAttribute('href')
                 messageSender({command: 'newtab', url: location.protocol + document.domain + leaguePage})
-                // console.log(leaguePage)
 
                 //fetch page
 
@@ -212,7 +328,7 @@ function logTeams(){
 // chrome.runtime.sendMessage({greeting: "hello"},responseHandler)
 
 function messageReceiver(request, sender, sendResponse){
-
+    scheduleForUpload(6)
     // getRegistrations()
 }
 
