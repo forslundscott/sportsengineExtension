@@ -26,12 +26,12 @@ function messageSender(tab, message){
     })
 }
 
-function getTabs(specifications = {}){
+async function getTabs(specifications = {}){
     var tabList
-    chrome.tabs.query({}, function(tabs) {
-        tabList = tabs
-      });
-      return tabList
+
+    return await chrome.tabs.query(specifications).then(list=>list[0]);
+    // console.log(tabList)  
+    // return tabList
 }
 
 function changeTabProperties(tab,properties){
