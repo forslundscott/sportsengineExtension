@@ -18,6 +18,7 @@ class game {
 class scheduleList{
     constructor(){
         this.keys = [
+            'Start_Date',
             'Start_Time',
             'End_Date',
             'End_Time',
@@ -327,10 +328,57 @@ function logTeams(){
 // chrome.runtime.sendMessage({greeting: "hello"},responseHandler)
 
 function messageReceiver(request, sender, sendResponse){
-    scheduleForUpload(6)
+    if(document.location.href.match(/https:.*glosoccer.sportngin.com.sport_management.teams/)){
+        if(document.location.href.match(/https:.*glosoccer.sportngin.com.sport_management.teams/)[0]==document.location.href){
+            console.log('SETeams')
+            scheduleForUpload(6)
+        }
+    }
+        if(document.location.href=='file:///home/scott/Documents/Projects/ChromeExtensions/sportsengineExtension/fireFox/schedule.html'){
+            console.log('schedule.html')
+            scheduleLobsterExport()
+            // scheduleForUpload(6)
+        }
+
+    if(document.location.href.match(/https:.*leaguelobster.com.*/)){
+        if(document.location.href.match(/https:.*leaguelobster.com.*/)[0]==document.location.href){
+            console.log('LeagueLobster')
+            scheduleLobsterExport()
+            // scheduleForUpload(6)
+        }
+    }
     // getRegistrations()
 }
-
+function scheduleLobsterExport(){
+    var weeks = document.getElementsByClassName("schedule-week-container")
+    var schedule = []
+    for(var i=0;i<weeks.length;i++){
+        var currentWeek = []
+        var week = weeks[i]
+        var matches = week.getElementsByClassName("match-droppable")
+        for(var j=0;j<matches.length;j++){
+            var currentMatch = []
+            var team1 = matches[j].getElementsByClassName("match-team")[0]
+            var team2 =matches[j].getElementsByClassName("match-team")[1]
+            currentMatch.push(team1.innerText)
+            currentMatch.push(team2.innerText)
+            currentWeek.push(currentMatch)
+        }
+        schedule.push(currentWeek)
+    }
+    var csvStr = ''
+    for(var i=0;i<schedule.length;i++){
+        var week = schedule[i]
+        if(!csvStr==''){csvStr+='\n\n\n'}
+        for(var j=0;j<week.length;j++){
+            if(!csvStr==''){csvStr+='\n'}
+            var match = week[j]
+            csvStr+=match[0]+','+match[1]
+        }
+    }
+    window.open("data:text/csv,"+encodeURI(csvStr))
+    // console.log(csvStr)
+}
 function messageSender(message){
     chrome.runtime.sendMessage(message,function (response){
         console.log(response)
