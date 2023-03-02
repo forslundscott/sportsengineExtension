@@ -10,9 +10,9 @@ var teamData = [
 ]
 class game {
     constructor(){
-        this.datetime = Date.now()
-        this.match
-
+        this.date = ''
+        this.opponent = ''
+        this.time = ''
     }
 }
 class scheduleList{
@@ -62,6 +62,14 @@ class team{
         this.id = ''
         this.name = ''
         this.rating = 3
+    }
+}
+class player{
+    constructor(){
+        this.firstName = ''
+        this.lastName = ''
+        this.email = ''
+        this.team = ''
     }
 }
 
@@ -289,6 +297,106 @@ function getTeams(){
     }
     return teamList
 }
+
+function getPlayers(){
+    var teamList = []
+    var headers = document.getElementsByTagName('thead')[0].getElementsByTagName('th')
+    var headerIndexes = {}
+    for(var i=0;i<headers.length;i++){
+
+        switch(headers[i].innerText){
+            case 'First Name':
+                headerIndexes.firstName = i
+                break
+            case 'Last Name':
+                headerIndexes.lastName = i
+                break
+            case 'Email':
+                headerIndexes.email = i
+                break
+            case 'Team':
+                headerIndexes.team = i
+                break
+            case 'Subseason':
+                break
+        }
+    }
+    var teamRows = document.getElementsByClassName('playerRow')
+    for(var i=0;i<teamRows.length;i++){
+        if(teamRows[i].style.display !== 'none'){
+            var currentPlayer = new player
+            
+            if(!teamRows[i].getElementsByTagName('td')[headerIndexes.team].getElementsByTagName('input').length == 0){
+                currentPlayer.team = teamRows[i].getElementsByTagName('td')[headerIndexes.team].getElementsByTagName('input')[0].value
+            }else{
+                currentPlayer.team = teamRows[i].getElementsByTagName('td')[headerIndexes.team].innerText
+            }
+            
+            if(!teamRows[i].getElementsByTagName('td')[headerIndexes.firstName].getElementsByTagName('input').length == 0){
+                currentPlayer.firstName = teamRows[i].getElementsByTagName('td')[headerIndexes.firstName].getElementsByTagName('input')[0].value
+            }else{
+                currentPlayer.firstName = teamRows[i].getElementsByTagName('td')[headerIndexes.firstName].innerText
+            }
+
+            if(!teamRows[i].getElementsByTagName('td')[headerIndexes.lastName].getElementsByTagName('input').length == 0){
+                currentPlayer.lastName = teamRows[i].getElementsByTagName('td')[headerIndexes.lastName].getElementsByTagName('input')[0].value
+            }else{
+                currentPlayer.lastName = teamRows[i].getElementsByTagName('td')[headerIndexes.lastName].innerText
+            }
+            
+            // currentPlayer.lastName = teamRows[i].getElementsByTagName('td')[headerIndexes.lastName].innerText
+            if(!teamRows[i].getElementsByTagName('td')[headerIndexes.email].getElementsByTagName('input').length == 0){
+                currentPlayer.email = teamRows[i].getElementsByTagName('td')[headerIndexes.email].getElementsByTagName('input')[0].value
+            }else{
+                currentPlayer.email = teamRows[i].getElementsByTagName('td')[headerIndexes.email].innerText
+            }
+            // currentPlayer.email = teamRows[i].getElementsByTagName('td')[headerIndexes.email].innerText
+            if(!(currentPlayer.team in teamList)){
+                teamList[currentPlayer.team] = []
+            }
+            teamList[currentPlayer.team].push(currentPlayer)
+        }
+    }
+    return teamList
+}
+function getGames(){
+    var gameList = []
+    var headers = document.getElementsByTagName('thead')[0].getElementsByTagName('th')
+    var headerIndexes = {}
+    for(var i=0;i<headers.length;i++){
+
+        switch(headers[i].innerText){
+            case 'DATE':
+                headerIndexes.date = i
+                break
+            case 'OPPONENT':
+                headerIndexes.opponent = i
+                break
+            case 'STATUS':
+                headerIndexes.time = i
+                break
+            // case 'Team':
+            //     headerIndexes.team = i
+            //     break
+            // case 'Subseason':
+            //     break
+        }
+    }
+    var teamRows = document.getElementsByClassName('compactGameList')
+    for(var i=0;i<teamRows.length;i++){
+        if(teamRows[i].style.display !== 'none'){
+            var currentGame = new game
+            currentGame.date = teamRows[i].getElementsByTagName('td')[headerIndexes.date].innerText
+            currentGame.opponent = teamRows[i].getElementsByTagName('td')[headerIndexes.opponent].innerText
+            currentGame.time = teamRows[i].getElementsByTagName('td')[headerIndexes.time].innerText
+            gameList.push(currentGame)
+        }
+    }
+    return gameList
+}
+
+
+
 function getRegistrations(){
     if(document.getElementById('topNav')){
         if(document.getElementById('topNav').getAttribute('data-title') == 'Registrations'){
@@ -331,10 +439,15 @@ function messageReceiver(request, sender, sendResponse){
     if(document.location.href.match(/https:.*glosoccer.sportngin.com.sport_management.teams/)){
         if(document.location.href.match(/https:.*glosoccer.sportngin.com.sport_management.teams/)[0]==document.location.href){
             console.log('SETeams')
-            scheduleForUpload(6)
+            
+            var formTag = document.createElement('object')
+            formTag.type = 'text/html'
+            formTag.data = chrome.runtime.getURL('form.html')
+            document.body.appendChild(formTag)
+            // scheduleForUpload(6)
         }
     }
-        if(document.location.href=='file:///home/scott/Documents/Projects/ChromeExtensions/sportsengineExtension/chrome/schedule.html'){
+        if(document.location.href=='/home/scott/Documents/Projects/ChromeExtensions/sportsengineExtension/schedule.html'){
             console.log('schedule.html')
             scheduleLobsterExport()
             // scheduleForUpload(6)
@@ -385,3 +498,10 @@ function messageSender(message){
     })
 }
 
+function openForm() {
+    document.getElementById("myForm").style.display = "block";
+  }
+  
+  function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+  }

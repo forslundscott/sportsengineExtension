@@ -334,7 +334,7 @@ function messageReceiver(request, sender, sendResponse){
             scheduleForUpload(6)
         }
     }
-        if(document.location.href=='file:///home/scott/Documents/Projects/ChromeExtensions/sportsengineExtension/fireFox/schedule.html'){
+        if(document.location.href=='/home/scott/Documents/Projects/ChromeExtensions/sportsengineExtension/schedule.html'){
             console.log('schedule.html')
             scheduleLobsterExport()
             // scheduleForUpload(6)
@@ -384,4 +384,5 @@ function messageSender(message){
         console.log(response)
     })
 }
+
 

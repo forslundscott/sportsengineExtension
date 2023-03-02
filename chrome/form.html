@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<button class="open-button" onclick="openForm()">Open Form</button>
+
+  <form action="/action_page.php" class="form-container">
+    <div class="header">Schedule Generator</div>
+    <div class="contentBody">
+        <label for="numberOfGames" class="teamLabel"># of Games</label>
+        <input type="number" name="numberOfGames" value="6" class="teamSkill">
+        <br>
+        <br>
+        <!-- start and end dates -->
+        <label for="start" class="teamLabel">Start date:</label>
+        <input type="date" class="teamSkill" id="start" name="trip-start" value="2023-02-25" min="2023-02-25" max="2023-12-31">
+        <br>
+        <br>
+        <label for="end" class="teamLabel">End date:</label>
+        <input type="date" class="teamSkill" id="end" name="trip-end" value="2023-02-25" min="2023-02-25" max="2023-12-31">
+        <br>
+        <br>
+        <!-- days of the week -->
+        <div style="width: 100%; display: grid; grid-template-columns: 50%; border: solid 1px;">
+            <div style="grid-column: 1 / span 1; display: grid; align-items: center;" >
+                Day(s) of Games
+            </div>
+            <div style="grid-column: 2 / span 1;">
+                <input type="checkbox" id="sunday" name="sunday" value="Sunday" class="">
+                <label for="sunday" class="">Sunday</label><br>
+                <input type="checkbox" id="monday" name="sunday" value="Monday" class="">
+                <label for="monday" class="">Monday</label><br>
+                <input type="checkbox" id="tuesday" name="sunday" value="Tuesday" class="">
+                <label for="tuesday" class="">Tuesday</label><br>
+                <input type="checkbox" id="wednesday" name="sunday" value="Wednesday" class="">
+                <label for="wednesday" class="">Wednesday</label><br>
+                <input type="checkbox" id="thursday" name="sunday" value="Thursday" class="">
+                <label for="thursday" class="">Thursday</label><br>
+                <input type="checkbox" id="friday" name="sunday" value="Friday" class="">
+                <label for="friday" class="">Friday</label><br>
+                <input type="checkbox" id="saturday" name="sunday" value="Saturday" class="">
+                <label for="saturday" class="">Saturday</label><br>
+            </div>
+        </div>
+        <br>
+        <!-- odd game handler -->
+        <label for="oddNumber" class="teamLabel">Handle Odd</label>
+        <select name="oddNumber" id="" class="teamSkill">
+            <option value="play">Play Every Week</option>
+            <option value="bye">BYE</option>
+        </select>
+        <br>
+        <br>
+        <!-- priorities -->
+        <div style="width: 100%; float: left; border: solid 1px;">
+            <div style="width: 50%; float: left;">Drag to order based on Priority</div>
+            <ul class="drag-sort-enable">
+                <li>Minimum Number of Games</li>
+                <li>Equal Games Per Team</li>
+                <li>Play Every Team</li>
+            </ul>
+        </div>
+        <br>
+        <br>
+        <br>
+        <!-- teams -->
+        <label for="HON" class="teamLabel"><b>HON</b></label>
+        <input class="teamSkill" type="number" placeholder="Skill Level" name="HON">
+        <br>
+        <br>
+        <label for="BSG" class="teamLabel"><b>BSG</b></label>
+        <input class="teamSkill" type="number" placeholder="Skill Level" name="BSG">
+        <br>
+        <br>
+        <br>
+    </div>
+    <!-- buttons -->
+    <div class="buttonContainer">
+        <button type="submit" class="btn">Generate</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
+    </div>
+</form>
+
+<script>
+    function enableDragSort(listClass) {
+    const sortableLists = document.getElementsByClassName(listClass);
+    Array.prototype.map.call(sortableLists, (list) => {enableDragList(list)});
+    }
+
+    function enableDragList(list) {
+    Array.prototype.map.call(list.children, (item) => {enableDragItem(item)});
+    }
+
+    function enableDragItem(item) {
+    item.setAttribute('draggable', true)
+    item.ondrag = handleDrag;
+    item.ondragend = handleDrop;
+    }
+
+    function handleDrag(item) {
+    const selectedItem = item.target,
+            list = selectedItem.parentNode,
+            x = event.clientX,
+            y = event.clientY;
+    
+    selectedItem.classList.add('drag-sort-active');
+    let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
+    
+    if (list === swapItem.parentNode) {
+        swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
+        list.insertBefore(selectedItem, swapItem);
+    }
+    }
+
+    function handleDrop(item) {
+    item.target.classList.remove('drag-sort-active');
+    }
+
+    (()=> {enableDragSort('drag-sort-enable')})();
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+</script>
+
+</body>
+</html>
