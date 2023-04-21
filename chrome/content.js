@@ -354,12 +354,18 @@ function getPlayers(){
             if(!(currentPlayer.team in teamList)){
                 teamList[currentPlayer.team] = []
             }
-            teamList[currentPlayer.team].push(currentPlayer)
+
+            teamList[currentPlayer.team].push(currentPlayer.email)
         }
     }
     return teamList
 }
 function getGames(){
+    if(!document.getElementById('tool-game-schedule').classList.contains('selected')){
+        document.getElementById('tool-game-schedule').getElementsByTagName('a')[0].click()
+    }else{
+        console.log('Already There')
+    }
     var gameList = []
     var headers = document.getElementsByTagName('thead')[0].getElementsByTagName('th')
     var headerIndexes = {}
@@ -394,7 +400,44 @@ function getGames(){
     }
     return gameList
 }
+function sendReminderSE(){
+    // the following finds the message button and clicks it
+    for(var i=0;i<tempvar.length;i++){
+        if(tempvar[i].innerText == 'MESSAGE'){
+            tempvar[i].click()
+        }
+    }
+    // the following is the to box
+    document.getElementsByClassName('select2-search__field')
 
+    // the following checks if filters is open and opens it if not
+    if(document.getElementsByClassName('pl-filter-panel pl-pane pl-pane--shrink pl-pane--condense-y pl-pane--border pl-pane--border-above pl-layout--on-gray-xxlight')[0].classList.contains('ng-hide')){
+        // open filter options
+        document.getElementsByClassName('pl-button pl-filter-button show@tablet ng-scope pl-button--highlight')[0].click()
+    }
+    // open first filter dropdown
+    document.getElementById('filter-bucket-27').click()
+
+    // select team roster option
+    document.getElementById('filter-bucket-team_instance_ids').click()
+
+    // this is the select dropdown box for teams
+    document.getElementById('filter-panel-data-source-select-32')
+
+    // list of options
+    var ops = document.getElementById('filter-panel-data-source-select-32').getElementsByTagName('option')
+
+    // find team option and select
+
+    for(var i=0;i<ops.length;i++){
+        var currentOp = ops[i]
+        if(currentOp.innerText.includes('Indoor The Branch SG Roster')){
+            document.getElementById('filter-panel-data-source-select-32').value = currentOp.innerText
+            break
+        }
+    }
+
+}
 
 
 function getRegistrations(){
@@ -438,13 +481,13 @@ function logTeams(){
 function messageReceiver(request, sender, sendResponse){
     if(document.location.href.match(/https:.*glosoccer.sportngin.com.sport_management.teams/)){
         if(document.location.href.match(/https:.*glosoccer.sportngin.com.sport_management.teams/)[0]==document.location.href){
-            console.log('SETeams')
+            // console.log('SETeams')
             
-            var formTag = document.createElement('object')
-            formTag.type = 'text/html'
-            formTag.data = chrome.runtime.getURL('form.html')
-            document.body.appendChild(formTag)
-            // scheduleForUpload(6)
+            // var formTag = document.createElement('object')
+            // formTag.type = 'text/html'
+            // formTag.data = chrome.runtime.getURL('form.html')
+            // document.body.appendChild(formTag)
+            scheduleForUpload(6)
         }
     }
         if(document.location.href=='/home/scott/Documents/Projects/ChromeExtensions/sportsengineExtension/schedule.html'){

@@ -13,41 +13,53 @@
     <div class="header">Schedule Generator</div>
     <div class="contentBody">
         <label for="numberOfGames" class="teamLabel"># of Games</label>
-        <input type="number" name="numberOfGames" value="6" class="teamSkill">
+        <input type="number" name="numberOfGames" value="8" class="teamSkill">
         <br>
         <br>
-        <!-- start and end dates -->
-        <label for="start" class="teamLabel">Start date:</label>
-        <input type="date" class="teamSkill" id="start" name="trip-start" value="2023-02-25" min="2023-02-25" max="2023-12-31">
-        <br>
-        <br>
-        <label for="end" class="teamLabel">End date:</label>
-        <input type="date" class="teamSkill" id="end" name="trip-end" value="2023-02-25" min="2023-02-25" max="2023-12-31">
-        <br>
-        <br>
+
         <!-- days of the week -->
         <div style="width: 100%; display: grid; grid-template-columns: 50%; border: solid 1px;">
             <div style="grid-column: 1 / span 1; display: grid; align-items: center;" >
                 Day(s) of Games
             </div>
-            <div style="grid-column: 2 / span 1;">
-                <input type="checkbox" id="sunday" name="sunday" value="Sunday" class="">
+            <div id="dayChecks" style="grid-column: 2 / span 1;">
+                <input type="checkbox" id="sunday" name="sunday" value="0" class="">
                 <label for="sunday" class="">Sunday</label><br>
-                <input type="checkbox" id="monday" name="sunday" value="Monday" class="">
+                <input type="checkbox" id="monday" name="sunday" value="1" class="">
                 <label for="monday" class="">Monday</label><br>
-                <input type="checkbox" id="tuesday" name="sunday" value="Tuesday" class="">
+                <input type="checkbox" id="tuesday" name="sunday" value="2" class="">
                 <label for="tuesday" class="">Tuesday</label><br>
-                <input type="checkbox" id="wednesday" name="sunday" value="Wednesday" class="">
+                <input type="checkbox" id="wednesday" name="sunday" value="3" class="">
                 <label for="wednesday" class="">Wednesday</label><br>
-                <input type="checkbox" id="thursday" name="sunday" value="Thursday" class="">
+                <input type="checkbox" id="thursday" name="sunday" value="4" class="">
                 <label for="thursday" class="">Thursday</label><br>
-                <input type="checkbox" id="friday" name="sunday" value="Friday" class="">
+                <input type="checkbox" id="friday" name="sunday" value="5" class="">
                 <label for="friday" class="">Friday</label><br>
-                <input type="checkbox" id="saturday" name="sunday" value="Saturday" class="">
+                <input type="checkbox" id="saturday" name="sunday" value="6" class="">
                 <label for="saturday" class="">Saturday</label><br>
             </div>
         </div>
+
+        <!-- start and end dates -->
+        <label for="start" class="teamLabel">Start date:</label>
+        <input type="date" class="teamSkill" id="start" name="trip-start" min="2023-02-25" max="2023-12-31">
         <br>
+        <label for="end" class="teamLabel">End date:</label>
+        <input type="date" class="teamSkill" id="end" name="trip-end" min="2023-02-25" max="2023-12-31">
+        <br>
+        <br>
+        <button type="button" onclick="generateDates()">Generate Dates</button>
+        <!-- No Game Dates -->
+        <div style="width: 100%; display: grid; grid-template-columns: 50%; border: solid 1px;">
+            <div style="grid-column: 1 / span 1; display: grid; align-items: center;" >
+                No Game Dates:
+            </div>
+            <div id="holidayChecks" style="grid-column: 2 / span 1;">
+            </div>
+        </div>
+        <!-- <label for="appt">Game Time</label>
+        
+        <input type="time" id="appt" name="appt" min="17:30" max="23:00" step="1800" required> -->
         <!-- odd game handler -->
         <label for="oddNumber" class="teamLabel">Handle Odd</label>
         <select name="oddNumber" id="" class="teamSkill">
@@ -57,7 +69,7 @@
         <br>
         <br>
         <!-- priorities -->
-        <div style="width: 100%; float: left; border: solid 1px;">
+        <!-- <div style="width: 100%; float: left; border: solid 1px;">
             <div style="width: 50%; float: left;">Drag to order based on Priority</div>
             <ul class="drag-sort-enable">
                 <li>Minimum Number of Games</li>
@@ -67,9 +79,9 @@
         </div>
         <br>
         <br>
-        <br>
+        <br> -->
         <!-- teams -->
-        <label for="HON" class="teamLabel"><b>HON</b></label>
+        <!-- <label for="HON" class="teamLabel"><b>HON</b></label>
         <input class="teamSkill" type="number" placeholder="Skill Level" name="HON">
         <br>
         <br>
@@ -77,7 +89,7 @@
         <input class="teamSkill" type="number" placeholder="Skill Level" name="BSG">
         <br>
         <br>
-        <br>
+        <br> -->
     </div>
     <!-- buttons -->
     <div class="buttonContainer">
@@ -87,6 +99,49 @@
 </form>
 
 <script>
+    var sDate = new Date()
+    // var eDate = sDate.setDate(sDate.getDate()+7)
+    
+    document.getElementById('start').value = sDate.toLocaleDateString('en-CA')
+    sDate.setDate(sDate.getDate()+(7*8)+1)
+    document.getElementById('end').value = sDate.toLocaleDateString('en-CA')
+    function generateDates(){
+        var gDays = []
+        var weekDays = document.getElementById('dayChecks').getElementsByTagName('input');
+        for(var i=0;i<weekDays.length;i++){
+            var wDay = weekDays[i]
+            if(wDay.checked == true){
+                gDays.push(wDay.value)
+            }
+        }
+        console.log(gDays)
+        sDate = new Date(document.getElementById('start').value + 'est')
+        // console.log(sDate)
+        eDate = new Date(document.getElementById('end').value + 'est')
+        // console.log(eDate)
+        var container = document.getElementById('holidayChecks');
+        container.innerHTML = ''
+        for (var d = sDate; d <= eDate; d.setDate(d.getDate() + 1)) {
+            // console.log(d)
+            if(gDays.includes(d.getDay().toString())){
+                var chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.name = d.getTime()
+                chk.value = d.getTime();
+                container.appendChild(chk);
+                
+                // container.appendChild(document.createElement('br'))
+
+                var lbl = document.createElement('label')
+                lbl.setAttribute('for',d.getTime())
+
+                lbl.innerHTML = d.toLocaleDateString()
+                container.appendChild(lbl)
+                container.appendChild(document.createElement('br'))
+            }
+        }
+    }
+
     function enableDragSort(listClass) {
     const sortableLists = document.getElementsByClassName(listClass);
     Array.prototype.map.call(sortableLists, (list) => {enableDragList(list)});
